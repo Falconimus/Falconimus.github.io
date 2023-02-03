@@ -1,0 +1,126 @@
+{% extends 'layout.html' %}
+{% block title %}
+    Absolute
+{% endblock %}
+
+{% block main %}
+    <!-- Different notes are being selected from depending on difficulty, setup variables accordingly. -->
+    {% if difficulty == 'Easy' %}
+        <script>
+            n = [0, 2, 4, 5, 7];
+            difficulty = 'Easy';
+        </script>
+    {% elif difficulty == 'Medium' %}
+        <script>
+            n = [0, 2, 4, 5, 7, 9, 11, 12];
+            difficulty = 'Medium';
+        </script>
+    {% else %}
+        <script>
+            n = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+            difficulty = 'Hard';
+        </script>
+    {% endif %}
+    <!-- Get Win-streak. -->
+    {% block javascript %}
+        <script>
+            var win_streak = {{ streak }};
+        </script>
+    {% endblock %}
+    <!-- Form for answer submission. -->
+    <div class="mb-3" id="challenge">
+        <img src="../static/images/NicePng_play-icon-png-transparent_3926192.png" id="play" alt="playbutton" height="100px">
+        <form id='select'action="/resultcheck" method="POST">
+            <p>Please select the note that is being played.</p>
+            <select id="note" class="form-select mx-auto w-auto center mb-3" name="response" type="submit" required>
+                <!-- Display options depending on difficulty. -->
+                <option value="" disabled selected>Note</option>
+                <option value="Do/C">Do/C</option>
+                {% if difficulty == 'Hard' %}
+                    <option value="Do#/C#">Do#/C#</option>
+                {% endif %}
+                <option value="Re/D">Re/D</option>
+                {% if difficulty == 'Hard' %}
+                    <option value="Re#/D#">Re#/D#</option>
+                {% endif %}
+                <option value="Mi/E">Mi/E</option>
+                <option value="Fa/F">Fa/F</option>
+                {% if difficulty == 'Hard' %}
+                    <option value="Fa#/F#">Fa#/F#</option>
+                {% endif %}
+                <option value="Sol/G">Sol/G</option>
+                {% if difficulty == 'Hard' %}
+                    <option value="Sol#/G#">Sol#/G#</option>
+                {% endif %}
+                {% if difficulty != 'Easy' %}
+                    <option value="La/A">La/A</option>
+                    {% if difficulty == 'Hard' %}
+                        <option value="La#/A#">La#/A#</option>
+                    {% endif %}
+                    <option value="Si/B">Si/B</option>
+                    <option value="Do2/C2">Do2/C2</option>
+                {% endif %}
+            </select>
+            <input type="submit">
+            <!-- Hidden inputes for "/resultcheck". -->
+            <input id="result_submission" type="hidden" name="result" value="">
+            <input id="note_submission" type="hidden" name="submitted_note" value="">
+            <input id="streak" type="hidden" name="streak" value="">
+            <input type="hidden" name="mode" value="Absolute">
+            <input type="hidden" name="difficulty" value="{{ difficulty }}">
+            <input type="hidden" id="correct_note"name="correct_note" value="">
+            <input id="image_nmb" type="hidden" name="correct_img_nmb" value="">
+        </form>
+    </div>
+    <script>
+        // Array for knowing the note names.
+        var note_names = ['Do/C', 'Do#/C#', 'Re/D', 'Re#/D#', 'Mi/E', 'Fa/F', 'Fa#/F#', 'Sol/G', 'Sol#/G#', 'La/A', 'La#/A#', 'Si/B', 'Do2/C2'];
+        // Have the play button as a variable to see when the user clicks it.
+        var playbutton = document.getElementById("play");
+        // Have all the sounds to be able to play them.
+        var notes = new Array('../static/sounds/piano/Do.mp3', '../static/sounds/piano/DoS.mp3', '../static/sounds/piano/Re.mp3', 
+                '../static/sounds/piano/ReS.mp3', '../static/sounds/piano/Mi.mp3', '../static/sounds/piano/Fa.mp3', '../static/sounds/piano/FaS.mp3', 
+                '../static/sounds/piano/Sol.mp3', '../static/sounds/piano/SolS.mp3', '../static/sounds/piano/La.mp3', '../static/sounds/piano/LaS.mp3', 
+                '../static/sounds/piano/Si.mp3', '../static/sounds/piano/Do2.mp3');
+        // Generate a random number and choose the sound that is to be played.
+        var randomnumber = Math.floor(Math.random() * (n.length));
+        var sound = new Audio(notes[n[randomnumber]]);
+        // Make sure the playbutton responds to clicks.
+        playbutton.onclick = function() {
+            // Play sound if its paused.
+            if (sound.paused)
+            {
+                sound.play();
+                playbutton.src = "../static/images/Pause-Button-Transparent.png";
+            }
+            // Pause sound if its playing.
+            else
+            {
+                sound.pause();
+                playbutton.src = "../static/images/NicePng_play-icon-png-transparent_3926192.png";
+            }           
+        }
+        // Make sure that when the sound ends, the button returns to a playbutton instead of a pause button.
+        sound.addEventListener('ended', function(){
+            playbutton.src = "../static/images/NicePng_play-icon-png-transparent_3926192.png";
+        });
+        // Test the submission for correctness.
+        document.querySelector('form').addEventListener('submit', function() {
+            let selected_note = document.getElementById('note');
+            if (selected_note.value == note_names[(n[randomnumber])])  
+                {
+                    win_streak += 1;
+                    document.getElementById("result_submission").value = "correct";
+                }
+                else
+                {   
+                    win_streak = 0;
+                    document.getElementById("result_submission").value = "wrong";
+                }
+            document.getElementById("streak").value = win_streak;
+            document.getElementById("note_submission").value = selected_note.value;
+            document.getElementById("correct_note").value = note_names[(n[randomnumber])];
+            document.getElementById("image_nmb").value = (n[randomnumber]);
+        });
+    </script>
+{% endblock %}

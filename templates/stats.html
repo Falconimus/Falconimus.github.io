@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Stats
+{% endblock %}
+
+{% block main %}
+    <!-- Display username. -->
+    <h2>User: {{ user_stats[0]["user_name"] }}</h2>
+    <!-- Stats table. -->
+    <table class="table tablemobile">
+        <thead>
+            <tr>
+                <th class="text-start">Exercise</th>
+                <th class="text-end">Difficulty</th>
+                <th class="text-end">Streak Highscore</th>
+                <th class="text-end">Win Rate</th>
+                <th class="text-end">Total Rounds played</th>
+                <th class="text-end">Total Wins</th>
+                <th class="text-end">Total Losses</th>
+                <th class="text-end">Leaderboard position</th>
+            </tr>
+        </thead>
+        <tbody>
+        <!-- Display all the user´s stats.-->
+        {% if user_stats %}
+            {% for stat in user_stats %}
+                <tr>
+                    <td class="text-start">{{ stat['exercise'] }}</th>
+                    <td class="text-end">{{ stat['difficulty'] }}</th>
+                    <td class="text-end">{{ stat['streak_highscore'] }}</th>
+                    <td class="text-end">{{ stat['win_rate'] }}</th>
+                    <td class="text-end">{{ stat['total_rounds'] }}</th>
+                    <td class="text-end">{{ stat['total_wins'] }}</th>
+                    <td class="text-end">{{ stat['total_losses'] }}</th>
+                    <td class="text-end">{{ stat['leaderbord_p'] }}</th>
+                </tr>
+            {% endfor %}
+        {% endif %}
+        </tbody>
+    </table>
+{% endblock %}

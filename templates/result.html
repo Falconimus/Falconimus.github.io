@@ -1,0 +1,84 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Result
+{% endblock %}
+
+{% block main %}
+    <!-- Background depending on result. -->
+    {% if result == 'correct' %}
+        <style>
+            body {
+                background-color: greenyellow;
+            }
+        </style>
+    {% else %}
+        <style>
+            body {
+                background-color: red;
+            }
+        </style>
+    {% endif %}
+    <div id="result" class="mb-3">
+        <!-- Display result. -->
+        <h1 id="result_text">{{ result | upper}}!</h1>
+        <!-- Display current streak. -->
+        <p id="streak">Streak: {{ win_streak }}</p>
+        <!-- In case the result was wrong, show the correct answer.-->
+        {% if result == 'wrong' %}
+            <p id="answer"> 
+                {% if mode == 'Absolute' %}
+                Correct Note: {{ correct_note }}
+                {% elif mode == 'Intervals' %}
+                Correct Interval: {{ correct_distance }} <br> Correct Direction: {{ correct_direction }}
+                {% endif %}
+            </p>
+            <p>The note that was being played:</p>
+            <img src="../static/images/Do.png" width="10%" class='center mb-3' id="answer_png" alt="note displayed on the scale">
+            {% if mode == 'Intervals' %}
+                <p>The second note that was being played:</p>
+                <img src="../static/images/Do.png" width="10%" class='center mb-3' id="answer2_png" alt="second note displayed on the scale">
+            {% endif %}
+        {% endif %}
+        <!-- Hidden inpute for the next round. -->
+        <form id="nextform" action="/exercises" method="post">
+            <input type="hidden" name="exercise" value="{{ mode }}">
+            <input type="hidden" name="difficulty" value="{{ difficulty }}">
+            <input type="hidden" name="streak" value="{{ win_streak }}">
+        </form>
+        <!-- Button if the user wants to play another round. -->
+        <p>Click "Next" to play again.</p>
+        <button class="btn btn-dark" type="submit" form="nextform" value="Submit">Next</button>
+    </div>
+    
+    <!-- Show images according to correct answer if answer was wrong. -->
+    {% if result == 'wrong' %}
+        {% block javascript %}
+            <script>
+                // Get the Image that should be displayed.
+                var img_number = JSON.parse({{ correct_img_nmb | tojson }});
+                var note_images = new Array('../static/images/Do.png', '../static/images/DoS.png', '../static/images/Re.png', '../static/images/ReS.png', 
+                    '../static/images/Mi.png', '../static/images/Fa.png', '../static/images/FaS.png', '../static/images/Sol.png', '../static/images/SolS.png', 
+                    '../static/images/La.png', '../static/images/LaS.png', '../static/images/Si.png', '../static/images/Do2.png');
+                // In the case the user is on a mobile device, adjust the image size accordingly.
+                if (screen.width < 480)
+                    {
+                        document.getElementById("answer_png").style.width = "50%";
+                    }
+                // Display the image. 
+                document.getElementById("answer_png").src = note_images[img_number];
+            </script>
+            {% if mode == 'Intervals' %}
+                    <script>
+                        // In case the mode is intervals, display second image correctly as well.
+                        var img_number2 = {{ correct_img_nmb2 }};
+                        if (screen.width < 480)
+                        {
+                            document.getElementById("answer2_png").style.width = "50%";
+                        }
+                        document.getElementById("answer2_png").src = note_images[img_number2];
+                    </script>
+            {% endif %}
+        {% endblock %}
+    {% endif %}
+{% endblock %}
