@@ -11,6 +11,9 @@ from flask import g, request, redirect, url_for, json
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+if __name__ == "__main__":
+    app.run(debug=false, host="0.0.0.0")
+    
 # Config for accounts.
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
